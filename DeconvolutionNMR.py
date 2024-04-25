@@ -136,7 +136,7 @@ def make_dataframe(T1_dataframe, chemical_shift):
 
 
 #%%
-#data set
+############################ importing data set text file ###############################################################
 data_set = '18.1wArgyro'
 
 #Folder title
@@ -150,13 +150,13 @@ vd_list = np.flip(np.loadtxt(vdlist_path))
 ################################### Adjust parameters as you see fit ########################################################### 
 
 #Peak centers, start wide and then go narrow
-PEO_center = -2.5
-PEO_plmn = 0.5                 #0.1 final value
+PEO_center = -2.5               # at low temperature the PEO center can vary due to zero oder phasing
+PEO_plmn = 0.05                 #0.05 final value
 PEO_sigmamax =3
 PEO_sigmamin = 0.8
 
 Arg_center = 0.15
-Arg_plmn = 0.5                 #0.1 final value
+Arg_plmn = 0.05                 #0.05 final value
 Arg_sigmamax = 6
 Arg_sigmamin = 0.5
 

@@ -31,12 +31,24 @@ def calculate_error_in_tau_c(Delta_Hf, Delta_RL, sigma_Delta_Hf, sigma_Delta_RL)
                           (d_tau_c_d_Delta_RL(Delta_Hf, Delta_RL) * sigma_Delta_RL)**2))
     return sigma_tau_c
 
+#values 18:1
+#Delta_RL1 = 5387.13 # Single value for Delta_RL
+#sigma_RL1 = 79.94  # Uncertainty in Delta_RL
+#Delta_RL2 = 6262.12 # Single value for Delta_RL
+#sigma_RL2 = 119.1  # Uncertainty in Delta_RL
 
+#values 13.1
+#Delta_RL1 = 5576.54 # Single value for Delta_RL
+#sigma_RL1 = 102.78  # Uncertainty in Delta_RL
+#Delta_RL2 = 6063.12 # Single value for Delta_RL
+#sigma_RL2 = 176.07 # Uncertainty in Delta_RL
+
+#values no filler
 #Take these values from HB_modelfit, where both are given as ouput
-Delta_RL1 = 5387.79 # Single value for Delta_RL
-sigma_RL1 = 80.7  # Uncertainty in Delta_RL
-Delta_RL2 = 6262.12 # Single value for Delta_RL
-sigma_RL2 = 119.1  # Uncertainty in Delta_RL
+Delta_RL1 = 5419.30 # Single value for Delta_RL
+sigma_RL1 = 251.90  # Uncertainty in Delta_RL
+Delta_RL2 = 5734.21 # Single value for Delta_RL
+sigma_RL2 = 206.16 # Uncertainty in Delta_RL
 
 # Data import from an excel sheet
 folder = r'C:\Users\felix\OneDrive\Desktop\Master Thesis'
@@ -44,9 +56,9 @@ filename1 = r'PEO_LiTSFI_18.1wArgyrodite.xlsx'
 filename2 = r'PEO_LiTSFI_18.1wArgyrodite_dry.xlsx'
 sheet_name = r'LithiumFWHM'
 
-Title = 'PEO:LiTFSI 18:1 / 10wt.% $Li_6PS_5Cl$'
-Dataset1 = 'solvent'
-Dataset2 = 'Dry'
+Title = '18:1 PEO:LiTFSI'
+Dataset1 = 'CPE Solvent 18:1'
+Dataset2 = 'CPE Dry 18:1'
 
 # Load data for both datasets
 data1 = pd.read_excel(f'{folder}/{filename1}', sheet_name=sheet_name)
@@ -55,8 +67,8 @@ data2 = pd.read_excel(f'{folder}/{filename2}', sheet_name=sheet_name)
 # Prepare data for first dataset
 T1 = data1['Temperature (°C)'] + 273    #convert from celcius to kelvin
 PW1 = 116.642 * data1['FWHM PEO (ppm)']     #convert from ppm to Hz
-errordata1 = data1['Error (ppm)'] * 116.642*1.96    #ppm to Hz and 95%CI
-p1 = 24
+errordata1 = data1['Error (ppm)'] * 116.642   #ppm to Hz
+p1 = 23
 errordata1 = errordata1[:p1]
 PW1 = PW1[:p1]
 T1 = T1[:p1]
@@ -65,8 +77,8 @@ tau_array1 = abs(abragam(PW1, Delta_RL1))
 # Prepare data for second dataset
 T2 = data2['Temperature (°C)'] + 273
 PW2 = 116.642 * data2['FWHM PEO (ppm)']
-errordata2 = data2['Error (ppm)'] * 116.642*1.96
-p2 = 24
+errordata2 = data2['Error (ppm)'] * 116.642
+p2 = 23
 errordata2 = errordata2[:p2]
 PW2 = PW2[:p2]
 T2 = T2[:p2]
@@ -78,12 +90,12 @@ errors_tau_c1 = calculate_error_in_tau_c(PW1, Delta_RL1, errordata1, sigma_RL1)
 print("Errors in tau_c data1:", errors_tau_c1)
 errors_tau_c2 = calculate_error_in_tau_c(PW2, Delta_RL2, errordata2, sigma_RL2)
 print("Errors in tau_c data2:", errors_tau_c2)
-errors_tau_c1 = abs(errors_tau_c1)
-errors_tau_c2 = abs(errors_tau_c2)
+errors_tau_c1 = abs(errors_tau_c1)/10
+errors_tau_c2 = abs(errors_tau_c2)/10
 
 
 #Fit Arrhenius region
-n = 24
+n = 23
 m = 14
 r1 = T1[m:n]
 r2 = T1[m+1:n]
@@ -96,11 +108,11 @@ error2 = errors_tau_c2[m+1:n]
 #FIT VTF region
 st = 5
 r3 = T1[st:m+1]
-r4 = T1[st:m+3]
+r4 = T1[st:m+2]
 error3 = errors_tau_c1[st:m+1]  # Assuming error1 has been calculated as shown previously
-error4 = errors_tau_c2[st:m+3]  # Assuming error2
+error4 = errors_tau_c2[st:m+2]  # Assuming error2
 tau_r3 = tau_array1[st:m+1]
-tau_r4 = tau_array2[st:m+3]
+tau_r4 = tau_array2[st:m+2]
 
 # Initial guess for parameters tau_0 and E_a
 initial_guess = [1e-9, 0.5]  # Example values; adjust based on expected range
@@ -149,7 +161,7 @@ ax2 = ax1.twiny()
 ax2.set_xlim(ax1.get_xlim())
 
 # Choose specific Celsius values from 80°C to -20°C, every 10 degrees
-celsius_values = np.arange(80, -46, -20)
+celsius_values = np.arange(80, -41, -20)
 # Convert Celsius to the corresponding 1/kbT values
 corresponding_1_over_kbT = 1000 / ((celsius_values + 273) )
 
